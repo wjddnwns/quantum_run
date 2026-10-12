@@ -102,7 +102,9 @@ namespace QuantumCrossy.Core
             visual.transform.localScale = Vector3.one * (config.playerRadius * 2f);
             DisableCollider(visual);
             Renderer glow = visual.GetComponent<Renderer>();
+            glow.shadowCastingMode = ShadowCastingMode.Off;
             glow.sharedMaterial = PrimitiveMaterials.Create(new Color(0.35f, 0.95f, 1f), 2.2f);
+            BlobShadow.Attach(playerGo.transform, 0.62f, 0.62f, null);
 
             var nose = GameObject.CreatePrimitive(PrimitiveType.Cube);
             nose.name = "Nose";
@@ -110,7 +112,9 @@ namespace QuantumCrossy.Core
             nose.transform.localPosition = new Vector3(0f, 0.05f, 0.72f);
             nose.transform.localScale = new Vector3(0.22f, 0.22f, 0.48f);
             DisableCollider(nose);
-            nose.GetComponent<Renderer>().sharedMaterial = PrimitiveMaterials.Create(new Color(0.9f, 1f, 1f), 1.5f);
+            Renderer noseRenderer = nose.GetComponent<Renderer>();
+            noseRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            noseRenderer.sharedMaterial = PrimitiveMaterials.Create(new Color(0.9f, 1f, 1f), 1.5f);
 
             Vector2Int cell = Vector2Int.zero;
             Vector3 start = world.CellToWorld(cell, config.playerBaseY);

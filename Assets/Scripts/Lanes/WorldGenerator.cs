@@ -165,8 +165,14 @@ namespace QuantumCrossy.Lanes
                 go.transform.localScale = new Vector3(config.gateThickness, config.gateHeight, config.gateDepth);
                 go.transform.position = new Vector3(x, config.gateHeight * 0.5f, row * config.cellSize);
                 var gate = go.AddComponent<MeasurementGate>();
-                gate.Initialize(row * config.cellSize, speed, config.gateTravelHalf, color);
+                gate.Initialize(row * config.cellSize, speed, config.gateTravelHalf, config.gateVisibleHalf, color);
                 lane.AddGate(gate);
+                Renderer gateRenderer = go.GetComponent<Renderer>();
+                BlobShadow.Attach(
+                    go.transform,
+                    Mathf.Max(0.36f, config.gateThickness * 2.4f),
+                    config.gateDepth * 0.92f,
+                    gateRenderer);
             }
         }
 
@@ -187,12 +193,15 @@ namespace QuantumCrossy.Lanes
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             go.name = "Photon";
             go.transform.SetParent(parent, true);
-            go.transform.position = new Vector3(x * config.cellSize, 0.9f, row * config.cellSize);
-            go.transform.localScale = new Vector3(0.1f, 0.42f, 0.1f);
-            go.transform.rotation = Quaternion.Euler(72f, Random.Range(0f, 180f), 18f);
+            go.transform.position = new Vector3(x * config.cellSize, 0.55f, row * config.cellSize);
+            go.transform.localScale = new Vector3(0.14f, 0.28f, 0.14f);
+            go.transform.rotation = Quaternion.Euler(58f, Random.Range(0f, 180f), 12f);
             Collider col = go.GetComponent<Collider>();
             col.isTrigger = true;
-            go.GetComponent<Renderer>().sharedMaterial = photonMat;
+            Renderer photonRenderer = go.GetComponent<Renderer>();
+            photonRenderer.sharedMaterial = photonMat;
+            photonRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            BlobShadow.Attach(go.transform, 0.34f, 0.34f, null);
             var ray = go.AddComponent<PhotonRay>();
             ray.Initialize(() => distribution.AddPhotons(1));
         }

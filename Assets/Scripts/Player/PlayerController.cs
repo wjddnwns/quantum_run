@@ -15,6 +15,7 @@ namespace QuantumCrossy.Player
     {
         readonly List<MeasurementGate> nearby = new List<MeasurementGate>(8);
         readonly List<MeasurementGate> rewarded = new List<MeasurementGate>(4);
+        readonly List<MeasurementGate> phased = new List<MeasurementGate>(4);
 
         QuantumCrossyConfig config;
         GridHopper hopper;
@@ -143,6 +144,8 @@ namespace QuantumCrossy.Player
             if (world == null || config == null)
                 return false;
 
+            PhotonRay.CollectAlong(from, to, config.photonPickupRadius);
+
             int row = Mathf.RoundToInt(to.z / config.cellSize);
             world.CopyGatesNear(row, 1, nearby);
             float forget = config.cellSize * 1.6f;
@@ -153,15 +156,34 @@ namespace QuantumCrossy.Player
                     rewarded.RemoveAt(i);
             }
 
+            float bodyReach = config.playerRadius + config.gateThickness * 0.5f + 0.08f;
+            for (int i = phased.Count - 1; i >= 0; i--)
+            {
+                MeasurementGate passing = phased[i];
+                if (passing == null || passing.ShouldReleasePhase(to, bodyReach))
+                    phased.RemoveAt(i);
+            }
+
+            bool quantumFrame = hopper != null && hopper.TryConsumeLogicalArc(out float arcHeight, out float arcDuration);
+
             for (int i = 0; i < nearby.Count; i++)
             {
                 MeasurementGate gate = nearby[i];
                 if (gate == null)
                     continue;
 
-                gate.Evaluate(from, to, config.playerRadius, out bool hit, out bool cleared);
+                bool hit;
+                bool cleared;
+                if (quantumFrame)
+                    gate.EvaluateOverTime(from, to, config.playerRadius, arcHeight, arcDuration, out hit, out cleared);
+                else
+                    gate.Evaluate(from, to, config.playerRadius, out hit, out cleared);
+
                 if (hit)
                 {
+                    if (phased.Contains(gate))
+                        continue;
+
                     flow.Collapse();
                     return true;
                 }
@@ -171,6 +193,8 @@ namespace QuantumCrossy.Player
 
                 rewarded.Add(gate);
                 pendingClears++;
+                if (quantumFrame && !phased.Contains(gate))
+                    phased.Add(gate);
             }
 
             return false;

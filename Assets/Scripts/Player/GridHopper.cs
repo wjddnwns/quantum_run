@@ -7,7 +7,7 @@ using QuantumCrossy.Input;
 namespace QuantumCrossy.Player
 {
     /// <summary>
-    /// 한 칸씩 호를 그리며 이동한다. 입력은 홉이 끝날 때까지 하나만 보관한다.
+    /// 일반 이동은 호를 그린다. 양자 도약은 한 칸을 즉시 건너뛰고 출발 자리에 잔상을 남긴다.
     /// </summary>
     public sealed class GridHopper : MonoBehaviour
     {
@@ -18,6 +18,9 @@ namespace QuantumCrossy.Player
         MoveCommand buffered;
         bool hasBuffer;
         bool flattened;
+        bool hasLogicalArc;
+        float logicalHeight;
+        float logicalDuration;
         Vector3 baseScale = Vector3.one;
 
         public Vector2Int Cell { get; private set; }
@@ -53,6 +56,20 @@ namespace QuantumCrossy.Player
             return had && command != MoveCommand.None;
         }
 
+        /// <summary>
+        /// 양자 도약 프레임에 한 번. 화면은 이미 도착해 있으므로, 판정만 예전 홉 궤적을 쓴다.
+        /// </summary>
+        public bool TryConsumeLogicalArc(out float height, out float duration)
+        {
+            height = logicalHeight;
+            duration = logicalDuration;
+            if (!hasLogicalArc)
+                return false;
+
+            hasLogicalArc = false;
+            return true;
+        }
+
         public void Hop(Vector2Int target, Vector3 worldTarget, bool quantum)
         {
             if (IsHopping)
@@ -74,33 +91,37 @@ namespace QuantumCrossy.Player
         {
             IsHopping = true;
             Vector3 start = transform.position;
-            float duration = Mathf.Max(0.05f, config.hopDuration);
-            float height = quantum ? config.quantumHopHeight : config.hopHeight;
-            float t = 0f;
+            Face(start, worldTarget);
 
-            if (visual != null)
+            if (quantum)
             {
-                Vector3 flat = worldTarget - start;
-                flat.y = 0f;
-                if (flat.sqrMagnitude > 0.001f)
-                    visual.rotation = Quaternion.LookRotation(flat.normalized, Vector3.up);
-            }
-
-            while (t < 1f)
-            {
-                t += Time.deltaTime / duration;
-                float u = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t));
-                Vector3 pos = Vector3.Lerp(start, worldTarget, u);
-                pos.y = Mathf.Lerp(start.y, worldTarget.y, u) + Mathf.Sin(u * Mathf.PI) * height;
-                ApplyPosition(pos);
-                if (visual != null && !flattened)
-                {
-                    float squash = quantum ? 1.15f : 1f;
-                    float yScale = Mathf.Lerp(0.82f, squash, Mathf.Sin(u * Mathf.PI));
-                    visual.localScale = new Vector3(baseScale.x, baseScale.y * yScale, baseScale.z);
-                }
-
+                LeaveGhost(start, worldTarget);
+                ApplyPosition(worldTarget);
+                logicalHeight = config.quantumHopHeight;
+                logicalDuration = Mathf.Max(0.05f, config.hopDuration);
+                hasLogicalArc = true;
                 yield return null;
+            }
+            else
+            {
+                float duration = Mathf.Max(0.05f, config.hopDuration);
+                float height = config.hopHeight;
+                float t = 0f;
+                while (t < 1f)
+                {
+                    t += Time.deltaTime / duration;
+                    float u = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t));
+                    Vector3 pos = Vector3.Lerp(start, worldTarget, u);
+                    pos.y = Mathf.Lerp(start.y, worldTarget.y, u) + Mathf.Sin(u * Mathf.PI) * height;
+                    ApplyPosition(pos);
+                    if (visual != null && !flattened)
+                    {
+                        float yScale = Mathf.Lerp(0.82f, 1f, Mathf.Sin(u * Mathf.PI));
+                        visual.localScale = new Vector3(baseScale.x, baseScale.y * yScale, baseScale.z);
+                    }
+
+                    yield return null;
+                }
             }
 
             ApplyPosition(worldTarget);
@@ -114,6 +135,29 @@ namespace QuantumCrossy.Player
             IsHopping = false;
             hopRoutine = null;
             Landed?.Invoke();
+        }
+
+        void Face(Vector3 start, Vector3 worldTarget)
+        {
+            if (visual == null)
+                return;
+
+            Vector3 flat = worldTarget - start;
+            flat.y = 0f;
+            if (flat.sqrMagnitude > 0.001f)
+                visual.rotation = Quaternion.LookRotation(flat.normalized, Vector3.up);
+        }
+
+        void LeaveGhost(Vector3 start, Vector3 worldTarget)
+        {
+            float life = Mathf.Max(0.05f, config.quantumGhostDuration);
+            Vector3 scale = visual != null ? visual.lossyScale : Vector3.one * 0.52f;
+            Quaternion rotation = visual != null ? visual.rotation : Quaternion.identity;
+            Afterimage.Spawn(start, rotation, scale, life, new Color(0.45f, 0.95f, 1f));
+
+            Vector3 mid = Vector3.Lerp(start, worldTarget, 0.32f);
+            mid.y = start.y;
+            Afterimage.Spawn(mid, rotation, scale * 0.55f, life * 0.72f, new Color(0.75f, 1f, 1f));
         }
 
         void ApplyPosition(Vector3 pos)

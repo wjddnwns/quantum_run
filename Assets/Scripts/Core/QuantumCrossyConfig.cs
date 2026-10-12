@@ -27,8 +27,11 @@ namespace QuantumCrossy.Core
         [Tooltip("일반 홉 높이. 판 높이보다 낮아서, 이 높이로는 판을 넘지 못한다")]
         public float hopHeight = 0.42f;
 
-        [Tooltip("판을 넘는 홉의 높이. 구체 바닥이 판 위로 뜨도록 잡는다")]
+        [Tooltip("양자 도약의 판정 높이. 화면은 순간이동이고, 이 높이의 논리 궤적으로 판을 넘었는지 본다")]
         public float quantumHopHeight = 1.15f;
+
+        [Tooltip("양자 도약 잔상이 남는 시간(초)")]
+        public float quantumGhostDuration = 0.32f;
 
         [Header("양자 도약")]
         [Tooltip("판이 몸에 닿기까지 남은 시간이 이보다 짧으면 너무 늦다")]
@@ -53,6 +56,9 @@ namespace QuantumCrossy.Core
         [Tooltip("레인을 막는 방향(Z)의 너비")]
         public float gateDepth = 0.86f;
         public float gateTravelHalf = 12f;
+
+        [Tooltip("이보다 바깥의 게이트는 숨긴다. 반대편으로 옮기는 지점(gateTravelHalf)보다 안쪽이어야 한다")]
+        public float gateVisibleHalf = 7.5f;
         public int minGatesPerLane = 1;
         public int maxGatesPerLane = 2;
 
@@ -77,6 +83,9 @@ namespace QuantumCrossy.Core
 
         [Tooltip("옆으로 나갈 때 최대 몇 칸까지. 1이면 바로 옆 칸만")]
         public int photonLateralReach = 1;
+
+        [Tooltip("광자 중심과의 수평 거리가 이하면 획득. 높이와 물리 트리거에 의존하지 않는다")]
+        public float photonPickupRadius = 0.45f;
 
         [Header("확률 / 점수")]
         [Tooltip("광자 하나가 고득점 쪽으로 분포를 기울이는 세기")]
@@ -125,6 +134,7 @@ namespace QuantumCrossy.Core
             if (hopDuration < 0.05f) hopDuration = 0.26f;
             if (hopHeight < 0.05f) hopHeight = 0.42f;
             if (quantumHopHeight < hopHeight) quantumHopHeight = 1.15f;
+            if (quantumGhostDuration < 0.05f) quantumGhostDuration = 0.32f;
             if (quantumWindowMin < 0f) quantumWindowMin = 0f;
             if (quantumWindowMax <= quantumWindowMin) quantumWindowMax = quantumWindowMin + 0.08f;
             if (quantumJumpBonusPhotons < 0) quantumJumpBonusPhotons = 0;
@@ -134,6 +144,10 @@ namespace QuantumCrossy.Core
             if (gateHeight < 0.2f) gateHeight = 0.78f;
             if (gateDepth < 0.05f) gateDepth = 0.86f;
             if (gateTravelHalf < playHalfWidth) gateTravelHalf = 12f;
+            if (gateVisibleHalf < 1f) gateVisibleHalf = 7.5f;
+            float minVisible = playHalfWidth * cellSize + 1.25f;
+            if (gateVisibleHalf < minVisible) gateVisibleHalf = minVisible;
+            if (gateVisibleHalf > gateTravelHalf - 1f) gateVisibleHalf = Mathf.Max(minVisible, gateTravelHalf - 1f);
             if (minGatesPerLane < 1) minGatesPerLane = 1;
             if (maxGatesPerLane < minGatesPerLane) maxGatesPerLane = minGatesPerLane;
             if (safeStartRows < 1) safeStartRows = 5;
@@ -143,6 +157,7 @@ namespace QuantumCrossy.Core
             if (photonRowChance < 0f) photonRowChance = 0.14f;
             if (photonLateralChance < 0f) photonLateralChance = 0f;
             if (photonLateralReach < 1) photonLateralReach = 1;
+            if (photonPickupRadius < 0.05f) photonPickupRadius = 0.45f;
             if (betaPerPhoton <= 0f) betaPerPhoton = 0.16f;
             if (highScoreMinScale <= 0f) highScoreMinScale = 20f;
             if (scorePerDistance <= 0f) scorePerDistance = 1f;
