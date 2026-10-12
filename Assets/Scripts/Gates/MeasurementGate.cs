@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.Rendering;
+using QuantumCrossy.Visuals;
 
 namespace QuantumCrossy.Gates
 {

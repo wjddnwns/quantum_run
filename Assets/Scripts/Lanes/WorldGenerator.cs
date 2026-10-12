@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using QuantumCrossy.Core;
 using QuantumCrossy.Gates;
 using QuantumCrossy.Rays;
@@ -139,7 +140,7 @@ namespace QuantumCrossy.Lanes
                 col.enabled = false;
             Renderer renderer = tile.GetComponent<Renderer>();
             renderer.sharedMaterial = material;
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.shadowCastingMode = ShadowCastingMode.Off;
         }
 
         void SpawnGates(Lane lane, int row)

@@ -164,7 +164,11 @@ namespace QuantumCrossy.Player
                     phased.RemoveAt(i);
             }
 
-            bool quantumFrame = hopper != null && hopper.TryConsumeLogicalArc(out float arcHeight, out float arcDuration);
+            float arcHeight = 0f;
+            float arcDuration = 0f;
+            bool quantumFrame = false;
+            if (hopper != null)
+                quantumFrame = hopper.TryConsumeLogicalArc(out arcHeight, out arcDuration);
 
             for (int i = 0; i < nearby.Count; i++)
             {
