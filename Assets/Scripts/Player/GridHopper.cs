@@ -23,7 +23,6 @@ namespace QuantumCrossy.Player
         public Vector2Int Cell { get; private set; }
         public int MaxForwardRow { get; private set; }
         public bool IsHopping { get; private set; }
-        public bool IsQuantumArc { get; private set; }
         public event Action Landed;
 
         public void Initialize(QuantumCrossyConfig config, Vector2Int cell, Transform visual, Rigidbody body)
@@ -74,7 +73,6 @@ namespace QuantumCrossy.Player
         IEnumerator HopRoutine(Vector2Int target, Vector3 worldTarget, bool quantum)
         {
             IsHopping = true;
-            IsQuantumArc = quantum;
             Vector3 start = transform.position;
             float duration = Mathf.Max(0.05f, config.hopDuration);
             float height = quantum ? config.quantumHopHeight : config.hopHeight;
@@ -113,7 +111,6 @@ namespace QuantumCrossy.Player
             if (Cell.y > MaxForwardRow)
                 MaxForwardRow = Cell.y;
 
-            IsQuantumArc = false;
             IsHopping = false;
             hopRoutine = null;
             Landed?.Invoke();

@@ -64,7 +64,7 @@ namespace QuantumCrossy.CameraRig
 
         void LookAtAnchor()
         {
-            Vector3 look = Anchor() + new Vector3(0f, 0.2f, config.cameraLookAhead);
+            Vector3 look = Anchor() + new Vector3(-config.cameraLookLeft, 0.15f, config.cameraLookAhead);
             Vector3 forward = look - transform.position;
             if (forward.sqrMagnitude > 0.001f)
                 transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
@@ -82,7 +82,8 @@ namespace QuantumCrossy.CameraRig
             float t = AspectT();
             float back = Mathf.Lerp(config.portraitBack, config.landscapeBack, t);
             float height = Mathf.Lerp(config.portraitHeight, config.landscapeHeight, t);
-            return Anchor() + new Vector3(0f, height, -back);
+            float side = Mathf.Lerp(config.portraitSide, config.landscapeSide, t);
+            return Anchor() + new Vector3(side, height, -back);
         }
 
         float CurrentFov()

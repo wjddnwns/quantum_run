@@ -7,15 +7,14 @@ using QuantumCrossy.Lanes;
 using QuantumCrossy.Rays;
 using QuantumCrossy.Scoring;
 using QuantumCrossy.UI;
-using QuantumCrossy.Visuals;
 
 namespace QuantumCrossy.Player
 {
     [DefaultExecutionOrder(10)]
     public sealed class PlayerController : MonoBehaviour
     {
-        readonly List<QuantumJumpRule.Match> matches = new List<QuantumJumpRule.Match>(4);
-        readonly PhaseTracker phases = new PhaseTracker();
+        readonly List<MeasurementGate> nearby = new List<MeasurementGate>(8);
+        readonly List<MeasurementGate> rewarded = new List<MeasurementGate>(4);
 
         QuantumCrossyConfig config;
         GridHopper hopper;
@@ -24,11 +23,9 @@ namespace QuantumCrossy.Player
         ScoreDistribution distribution;
         GameFlow flow;
         GameHud hud;
-        Renderer glow;
-        bool glowing;
-
-        static readonly Color IdleColor = new Color(0.35f, 0.95f, 1f);
-        static readonly Color PhaseColor = new Color(1f, 0.92f, 0.55f);
+        Vector3 previousPos;
+        int pendingClears;
+        bool hasPrevious;
 
         public int MaxForwardRow => hopper != null ? hopper.MaxForwardRow : 0;
 
@@ -39,8 +36,7 @@ namespace QuantumCrossy.Player
             MoveInput moveInput,
             ScoreDistribution distribution,
             GameFlow flow,
-            GameHud hud,
-            Renderer glow)
+            GameHud hud)
         {
             this.config = config;
             this.hopper = hopper;
@@ -49,24 +45,33 @@ namespace QuantumCrossy.Player
             this.distribution = distribution;
             this.flow = flow;
             this.hud = hud;
-            this.glow = glow;
+            previousPos = transform.position;
+            hasPrevious = true;
             hopper.Landed += OnLanded;
-            SetGlow(false);
         }
 
         void Update()
         {
-            if (hopper == null || world == null)
-                return;
-
-            world.UpdateTelegraphs(hopper.Cell);
-            SetGlow(phases.AnyActive || hopper.IsQuantumArc);
-
-            if (flow == null || !flow.IsPlaying || moveInput == null)
+            if (hopper == null || world == null || flow == null || !flow.IsPlaying || moveInput == null)
                 return;
 
             if (moveInput.TryConsume(out MoveCommand command))
                 TryMove(command);
+        }
+
+        void LateUpdate()
+        {
+            if (!hasPrevious)
+            {
+                previousPos = transform.position;
+                hasPrevious = true;
+                return;
+            }
+
+            Vector3 now = transform.position;
+            if (flow != null && flow.IsPlaying)
+                ResolveSegment(previousPos, now);
+            previousPos = now;
         }
 
         void OnLanded()
@@ -74,15 +79,25 @@ namespace QuantumCrossy.Player
             if (flow == null || !flow.IsPlaying)
                 return;
 
+            if (ResolveSegment(previousPos, transform.position))
+                return;
+
+            previousPos = transform.position;
+            if (pendingClears > 0)
+            {
+                int photons = config.quantumJumpBonusPhotons * pendingClears;
+                pendingClears = 0;
+                if (photons > 0)
+                {
+                    distribution.AddPhotons(photons);
+                    if (hud != null)
+                        hud.ShowQuantumJump(photons);
+                }
+            }
+
             world.EnsureAround(hopper.Cell.y);
             if (hud != null)
                 hud.SetDistance(hopper.MaxForwardRow);
-            Physics.SyncTransforms();
-            if (OverlapsUnphasedGate())
-            {
-                flow.Collapse();
-                return;
-            }
 
             if (hopper.ConsumeBuffer(out MoveCommand command))
                 TryMove(command);
@@ -107,33 +122,63 @@ namespace QuantumCrossy.Player
             world.EnsureAround(target.y);
             Vector3 from = world.CellToWorld(hopper.Cell, config.playerBaseY);
             Vector3 to = world.CellToWorld(target, config.playerBaseY);
-            Lane lane = world.GetLane(target.y);
-            bool quantum = lane != null && lane.IsGateLane && QuantumJumpRule.TryMatch(
+            world.CopyGatesNear(hopper.Cell.y, 1, nearby);
+            bool over = QuantumJumpRule.ShouldHopOver(
                 from,
                 to,
-                lane.Gates,
+                nearby,
                 config.quantumWindowMin,
                 config.quantumWindowMax,
-                config.playerRadius,
-                config.quantumPhasePadding,
-                matches);
+                config.playerRadius);
 
-            if (quantum)
+            pendingClears = 0;
+            hopper.Hop(target, to, over);
+        }
+
+        /// <summary>
+        /// 구간 안에서 판에 닿으면 측정. true면 런이 끝났다.
+        /// </summary>
+        bool ResolveSegment(Vector3 from, Vector3 to)
+        {
+            if (world == null || config == null)
+                return false;
+
+            int row = Mathf.RoundToInt(to.z / config.cellSize);
+            world.CopyGatesNear(row, 1, nearby);
+            float forget = config.cellSize * 1.6f;
+            for (int i = rewarded.Count - 1; i >= 0; i--)
             {
-                for (int i = 0; i < matches.Count; i++)
-                    phases.Add(matches[i].Gate, matches[i].PhaseDuration);
-                distribution.AddPhotons(config.quantumJumpBonusPhotons);
-                if (hud != null)
-                    hud.ShowQuantumJump(config.quantumJumpBonusPhotons);
+                MeasurementGate remembered = rewarded[i];
+                if (remembered == null || Mathf.Abs(remembered.transform.position.x - to.x) > forget)
+                    rewarded.RemoveAt(i);
             }
 
-            hopper.Hop(target, to, quantum);
+            for (int i = 0; i < nearby.Count; i++)
+            {
+                MeasurementGate gate = nearby[i];
+                if (gate == null)
+                    continue;
+
+                gate.Evaluate(from, to, config.playerRadius, out bool hit, out bool cleared);
+                if (hit)
+                {
+                    flow.Collapse();
+                    return true;
+                }
+
+                if (!cleared || rewarded.Contains(gate))
+                    continue;
+
+                rewarded.Add(gate);
+                pendingClears++;
+            }
+
+            return false;
         }
 
         public void PlayCollapseVisual()
         {
             hopper.Flatten();
-            SetGlow(false);
         }
 
         void OnDestroy()
@@ -152,58 +197,10 @@ namespace QuantumCrossy.Player
 
         void OnTriggerEnter(Collider other)
         {
-            HandleContact(other);
-        }
-
-        void OnTriggerStay(Collider other)
-        {
-            HandleContact(other);
-        }
-
-        void HandleContact(Collider other)
-        {
             if (flow == null || !flow.IsPlaying || other == null)
                 return;
-
             if (other.TryGetComponent(out PhotonRay ray))
-            {
                 ray.Collect();
-                return;
-            }
-
-            if (!other.TryGetComponent(out MeasurementGate gate))
-                return;
-            if (phases.IsPhasing(gate))
-                return;
-
-            flow.Collapse();
-        }
-
-        bool OverlapsUnphasedGate()
-        {
-            Collider[] hits = Physics.OverlapSphere(
-                transform.position,
-                config.playerRadius,
-                ~0,
-                QueryTriggerInteraction.Collide);
-
-            for (int i = 0; i < hits.Length; i++)
-            {
-                if (!hits[i].TryGetComponent(out MeasurementGate gate))
-                    continue;
-                if (!phases.IsPhasing(gate))
-                    return true;
-            }
-
-            return false;
-        }
-
-        void SetGlow(bool phase)
-        {
-            if (glow == null || glowing == phase)
-                return;
-            glowing = phase;
-            PrimitiveMaterials.Apply(glow.sharedMaterial, phase ? PhaseColor : IdleColor, phase ? 3.2f : 2.2f);
         }
     }
 }

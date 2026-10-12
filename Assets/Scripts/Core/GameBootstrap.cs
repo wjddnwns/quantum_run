@@ -99,7 +99,7 @@ namespace QuantumCrossy.Core
             var visual = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             visual.name = "Visual";
             visual.transform.SetParent(playerGo.transform, false);
-            visual.transform.localScale = Vector3.one * 0.72f;
+            visual.transform.localScale = Vector3.one * (config.playerRadius * 2f);
             DisableCollider(visual);
             Renderer glow = visual.GetComponent<Renderer>();
             glow.sharedMaterial = PrimitiveMaterials.Create(new Color(0.35f, 0.95f, 1f), 2.2f);
@@ -120,7 +120,7 @@ namespace QuantumCrossy.Core
             var hopper = playerGo.AddComponent<GridHopper>();
             hopper.Initialize(config, cell, visual.transform, body);
             var controller = playerGo.AddComponent<PlayerController>();
-            controller.Initialize(config, hopper, world, input, distribution, flow, hud, glow);
+            controller.Initialize(config, hopper, world, input, distribution, flow, hud);
             return controller;
         }
 

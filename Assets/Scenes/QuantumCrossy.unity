@@ -470,21 +470,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuantumCrossy.Core.QuantumCrossyConfig
   cellSize: 1
   playHalfWidth: 5
-  playerRadius: 0.34
-  playerBaseY: 0.36
-  hopDuration: 0.2
-  hopHeight: 0.65
-  quantumHopHeight: 1.45
-  quantumWindowMin: 0.06
-  quantumWindowMax: 0.42
-  quantumPhasePadding: 0.08
+  playerRadius: 0.26
+  playerBaseY: 0.3
+  hopDuration: 0.26
+  hopHeight: 0.42
+  quantumHopHeight: 1.15
+  quantumWindowMin: 0.04
+  quantumWindowMax: 0.1
   quantumJumpBonusPhotons: 2
   gateSpeed: 5.5
   gateSpeedPerRow: 0.035
   maxGateSpeed: 12
-  gateLength: 2.1
-  gateThickness: 0.16
-  gateHeight: 1.35
+  gateThickness: 0.14
+  gateHeight: 0.78
+  gateDepth: 0.86
   gateTravelHalf: 12
   minGatesPerLane: 1
   maxGatesPerLane: 2
@@ -494,18 +493,22 @@ MonoBehaviour:
   behindRows: 7
   gateLaneWeight: 0.58
   maxConsecutiveGateLanes: 2
-  photonsPerSafeLaneMin: 1
-  photonsPerSafeLaneMax: 2
+  photonRowChance: 0.14
+  photonLateralChance: 0.05
+  photonLateralReach: 1
   betaPerPhoton: 0.16
   highScoreMinScale: 20
   scorePerDistance: 1
-  portraitBack: 6.8
-  portraitHeight: 8.2
-  portraitFov: 50
-  landscapeBack: 10.5
-  landscapeHeight: 12.5
-  landscapeFov: 46
-  cameraLookAhead: 4.2
+  portraitBack: 7.6
+  portraitHeight: 5.5
+  portraitSide: 2.5
+  portraitFov: 48
+  landscapeBack: 9.6
+  landscapeHeight: 6.8
+  landscapeSide: 3.3
+  landscapeFov: 42
+  cameraLookAhead: 4.4
+  cameraLookLeft: 1.05
   cameraSmoothTime: 0.14
   portraitAspect: 0.5625
   landscapeAspect: 1.7778

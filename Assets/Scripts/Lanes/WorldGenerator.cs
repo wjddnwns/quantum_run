@@ -64,29 +64,18 @@ namespace QuantumCrossy.Lanes
             RemoveBehind(playerRow - config.behindRows);
         }
 
-        public void UpdateTelegraphs(Vector2Int cell)
+        public void CopyGatesNear(int row, int span, List<MeasurementGate> into)
         {
-            float playerX = cell.x * config.cellSize;
-            for (int n = 0; n < laneList.Count; n++)
+            into.Clear();
+            for (int r = row - span; r <= row + span; r++)
             {
-                Lane lane = laneList[n];
-                bool nearby = Mathf.Abs(lane.Row - cell.y) <= 1;
+                if (!lanes.TryGetValue(r, out Lane lane))
+                    continue;
                 IReadOnlyList<MeasurementGate> gates = lane.Gates;
                 for (int i = 0; i < gates.Count; i++)
                 {
-                    MeasurementGate gate = gates[i];
-                    if (gate == null)
-                        continue;
-                    bool show = false;
-                    if (nearby)
-                    {
-                        float time = gate.TimeUntilOverlap(playerX, config.playerRadius);
-                        show = gate.IsApproaching(playerX, config.playerRadius)
-                            && time >= config.quantumWindowMin
-                            && time <= config.quantumWindowMax;
-                    }
-
-                    gate.SetTelegraph(show);
+                    if (gates[i] != null)
+                        into.Add(gates[i]);
                 }
             }
         }
@@ -173,39 +162,39 @@ namespace QuantumCrossy.Lanes
                 GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 go.name = "MeasurementGate";
                 go.transform.SetParent(lane.transform, true);
-                go.transform.localScale = new Vector3(config.gateLength, config.gateHeight, config.gateThickness);
+                go.transform.localScale = new Vector3(config.gateThickness, config.gateHeight, config.gateDepth);
                 go.transform.position = new Vector3(x, config.gateHeight * 0.5f, row * config.cellSize);
                 var gate = go.AddComponent<MeasurementGate>();
-                gate.Initialize(row * config.cellSize, speed, config.gateTravelHalf, config.gateLength, color);
+                gate.Initialize(row * config.cellSize, speed, config.gateTravelHalf, color);
                 lane.AddGate(gate);
             }
         }
 
         void SpawnPhotons(Transform parent, int row)
         {
-            int count = Random.Range(config.photonsPerSafeLaneMin, config.photonsPerSafeLaneMax + 1);
-            if (count <= 0)
+            if (row <= 0 || Random.value > config.photonRowChance)
                 return;
 
-            var used = new HashSet<int>();
-            int guard = 0;
-            while (used.Count < count && guard++ < 24)
-                used.Add(Random.Range(-config.playHalfWidth, config.playHalfWidth + 1));
-
-            foreach (int x in used)
+            int x = 0;
+            if (Random.value < config.photonLateralChance)
             {
-                GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                go.name = "Photon";
-                go.transform.SetParent(parent, true);
-                go.transform.position = new Vector3(x * config.cellSize, 0.9f, row * config.cellSize);
-                go.transform.localScale = new Vector3(0.1f, 0.42f, 0.1f);
-                go.transform.rotation = Quaternion.Euler(72f, Random.Range(0f, 180f), 18f);
-                Collider col = go.GetComponent<Collider>();
-                col.isTrigger = true;
-                go.GetComponent<Renderer>().sharedMaterial = photonMat;
-                var ray = go.AddComponent<PhotonRay>();
-                ray.Initialize(() => distribution.AddPhotons(1));
+                int reach = Mathf.Max(1, config.photonLateralReach);
+                int mag = Random.Range(1, reach + 1);
+                x = Random.value < 0.5f ? -mag : mag;
+                x = Mathf.Clamp(x, -config.playHalfWidth, config.playHalfWidth);
             }
+
+            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            go.name = "Photon";
+            go.transform.SetParent(parent, true);
+            go.transform.position = new Vector3(x * config.cellSize, 0.9f, row * config.cellSize);
+            go.transform.localScale = new Vector3(0.1f, 0.42f, 0.1f);
+            go.transform.rotation = Quaternion.Euler(72f, Random.Range(0f, 180f), 18f);
+            Collider col = go.GetComponent<Collider>();
+            col.isTrigger = true;
+            go.GetComponent<Renderer>().sharedMaterial = photonMat;
+            var ray = go.AddComponent<PhotonRay>();
+            ray.Initialize(() => distribution.AddPhotons(1));
         }
 
         void RemoveBehind(int minKeep)

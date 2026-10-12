@@ -70,7 +70,7 @@ namespace QuantumCrossy.UI
             Place(hintRect, 0.07f, 0.02f, 0.93f, 0.13f);
             Text hint = CreateText(hintRoot.transform, "HintText", 28, FontStyle.Normal, TextAnchor.MiddleCenter, new Color(1f, 1f, 1f, 0.82f));
             Stretch(hint.rectTransform);
-            hint.text = "스와이프 / 마우스 드래그 / WASD\n스페이스는 전진\n게이트가 다가올 때 맞춰 뛰면 양자 도약";
+            hint.text = "스와이프 / 마우스 드래그 / WASD\n스페이스는 전진\n얇은 판이 지나갈 때 뛰어넘으면 양자 도약";
 
             toastText = CreateText(safeRoot, "Toast", 42, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.95f, 0.7f));
             Place(toastText.rectTransform, 0.1f, 0.62f, 0.9f, 0.70f);
