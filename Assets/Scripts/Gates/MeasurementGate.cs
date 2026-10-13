@@ -3,7 +3,7 @@ using UnityEngine;
 namespace QuantumCrossy.Gates
 {
     /// <summary>
-    /// 진행 방향(X)으로 움직이는 측정체. 레이저 막은 얇은 판이고, 기둥 둘은 그 양 끝 밖이다.
+    /// 진행 방향(X)으로 움직이는 측정체. 레이저는 좌우로 길고 Z로 얇으며, 기둥은 좌우 밖에 있다.
     /// 판정은 막과 기둥 부피를 따로 본다. 위치는 트랜스폼에 직접 쓴다.
     /// 리지드바디 보간을 쓰면 양 끝 순간이동이 화면 한가운데를 가로지르는 궤적으로 그려진다.
     /// </summary>
@@ -13,8 +13,7 @@ namespace QuantumCrossy.Gates
         Vector3 hitHalf;
         Vector3 hitOffset;
         Vector3 pillarHalf;
-        float pillarCenterY;
-        float pillarCenterZ;
+        Vector3 pillarCenter;
         bool hasPillars;
         Vector3 frameFrom;
         Vector3 frameTo;
@@ -50,14 +49,13 @@ namespace QuantumCrossy.Gates
         }
 
         /// <summary>
-        /// 막 양 끝 기둥. 중심은 게이트 원점 기준이고, 기둥 높이 전체를 판정에 넣는다.
+        /// 막 한쪽 기둥의 로컬 중심. 반대쪽은 X를 뒤집어 같은 크기로 판정한다.
         /// </summary>
-        public void SetPillars(Vector3 half, float centerY, float centerZ)
+        public void SetPillars(Vector3 half, Vector3 localCenter)
         {
             pillarHalf = half;
-            pillarCenterY = centerY;
-            pillarCenterZ = centerZ;
-            hasPillars = half.x > 0f && half.y > 0f && half.z > 0f && centerZ > 0f;
+            pillarCenter = localCenter;
+            hasPillars = half.x > 0f && half.y > 0f && half.z > 0f;
         }
 
         void Update()
@@ -136,13 +134,10 @@ namespace QuantumCrossy.Gates
 
         bool PillarHits(Vector3 player, float radius, Vector3 gate)
         {
-            Vector3 center = gate;
-            center.y += pillarCenterY;
-            center.z += pillarCenterZ;
-            if (SphereHits(player, radius, center, pillarHalf))
+            if (SphereHits(player, radius, gate + pillarCenter, pillarHalf))
                 return true;
-            center.z = gate.z - pillarCenterZ;
-            return SphereHits(player, radius, center, pillarHalf);
+            Vector3 other = new Vector3(-pillarCenter.x, pillarCenter.y, -pillarCenter.z);
+            return SphereHits(player, radius, gate + other, pillarHalf);
         }
 
         static bool SphereHits(Vector3 center, float radius, Vector3 boxCenter, Vector3 half)

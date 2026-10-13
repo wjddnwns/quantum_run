@@ -193,7 +193,7 @@ namespace QuantumCrossy.Lanes
                 var gate = go.AddComponent<MeasurementGate>();
                 gate.Initialize(row * config.cellSize, speed, config.gateTravelHalf, config.gateVisibleHalf, hitHalf, hitOffset);
                 if (visual != null)
-                    gate.SetPillars(visual.PillarHalf, visual.PillarCenterY, visual.PillarCenterZ);
+                    gate.SetPillars(visual.PillarHalf, visual.PillarCenter);
                 lane.AddGate(gate);
             }
         }

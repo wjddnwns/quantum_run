@@ -3,8 +3,8 @@ using UnityEngine;
 namespace QuantumCrossy.Gates
 {
     /// <summary>
-    /// 측정 게이트 모양. 레이저 막은 설정 상자(두께 × 높이 × 깊이)와 같고,
-    /// 기둥 둘은 그 막의 Z 양 끝 바로 밖에 선다.
+    /// 측정 게이트. 카메라는 +Z를 보므로 레이저는 Z로 얇고 X로 길다.
+    /// 기둥은 그 막의 좌우(X) 양 끝 밖에 선다.
     /// </summary>
     public sealed class MeasurementGateVisual : MonoBehaviour
     {
@@ -20,8 +20,7 @@ namespace QuantumCrossy.Gates
         public Vector3 LaserHalf { get; private set; }
         public Vector3 LaserOffset { get; private set; }
         public Vector3 PillarHalf { get; private set; }
-        public float PillarCenterY { get; private set; }
-        public float PillarCenterZ { get; private set; }
+        public Vector3 PillarCenter { get; private set; }
 
         public void Fit(float thickness, float height, float depth)
         {
@@ -29,31 +28,33 @@ namespace QuantumCrossy.Gates
             height = Mathf.Max(0.02f, height);
             depth = Mathf.Max(0.02f, depth);
 
+            // depth가 눈에 보이는 폭(X), thickness가 진행 방향 두께(Z)다.
+            float span = depth;
+            float thin = thickness;
             if (laser != null)
             {
                 laser.localPosition = new Vector3(0f, height * 0.5f, 0f);
-                laser.localScale = new Vector3(thickness, height, depth);
+                laser.localScale = new Vector3(span, height, thin);
             }
 
             float pillarHeight = Mathf.Max(PillarMinHeight, height + PillarExtraHeight);
-            float centerZ = depth * 0.5f + PillarDepth * 0.5f;
-            Vector3 pillarScale = new Vector3(PillarWidth, pillarHeight, PillarDepth);
-            Place(pillarPositive, centerZ, pillarHeight, pillarScale);
-            Place(pillarNegative, -centerZ, pillarHeight, pillarScale);
+            float centerX = span * 0.5f + PillarDepth * 0.5f;
+            Vector3 pillarScale = new Vector3(PillarDepth, pillarHeight, PillarWidth);
+            Place(pillarPositive, centerX, pillarHeight, pillarScale);
+            Place(pillarNegative, -centerX, pillarHeight, pillarScale);
 
-            LaserHalf = new Vector3(thickness, height, depth) * 0.5f;
+            LaserHalf = new Vector3(span, height, thin) * 0.5f;
             LaserOffset = new Vector3(0f, height * 0.5f, 0f);
             PillarHalf = pillarScale * 0.5f;
-            PillarCenterY = pillarHeight * 0.5f;
-            PillarCenterZ = centerZ;
+            PillarCenter = new Vector3(centerX, pillarHeight * 0.5f, 0f);
         }
 
-        static void Place(Transform pillar, float z, float height, Vector3 scale)
+        static void Place(Transform pillar, float x, float height, Vector3 scale)
         {
             if (pillar == null)
                 return;
 
-            pillar.localPosition = new Vector3(0f, height * 0.5f, z);
+            pillar.localPosition = new Vector3(x, height * 0.5f, 0f);
             pillar.localRotation = Quaternion.identity;
             pillar.localScale = scale;
         }
