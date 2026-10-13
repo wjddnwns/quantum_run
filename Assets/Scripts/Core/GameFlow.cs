@@ -16,6 +16,7 @@ namespace QuantumCrossy.Core
         GameHud hud;
         MoveInput moveInput;
         bool restarting;
+        bool collapsed;
 
         public bool IsPlaying { get; private set; }
 
@@ -40,6 +41,7 @@ namespace QuantumCrossy.Core
                 return;
 
             IsPlaying = false;
+            collapsed = true;
             if (moveInput != null)
                 moveInput.SetAccepting(false);
 
@@ -73,7 +75,7 @@ namespace QuantumCrossy.Core
 
         void Update()
         {
-            if (IsPlaying || restarting)
+            if (!collapsed || restarting)
                 return;
 
             Keyboard keyboard = Keyboard.current;

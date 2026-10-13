@@ -40,7 +40,14 @@ namespace QuantumCrossy.Scoring
 
         public int PhotonCount { get; private set; }
         public float HighScoreProbability { get; private set; }
+        public float HighScoreCutoff => highScoreMinScale;
+        public int StateCount => States.Length;
         public event Action Changed;
+
+        public Eigenstate StateAt(int index)
+        {
+            return States[index];
+        }
 
         public ScoreDistribution(float betaPerPhoton, float highScoreMinScale)
         {

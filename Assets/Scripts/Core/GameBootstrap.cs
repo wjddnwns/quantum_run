@@ -48,6 +48,7 @@ namespace QuantumCrossy.Core
             var hud = gameObject.AddComponent<GameHud>();
             var flow = gameObject.AddComponent<GameFlow>();
             hud.Build(flow.Restart);
+            input.SetAccepting(false);
 
             PlayerController player = CreatePlayer(world, input, distribution, flow, hud);
             BindCamera(player.transform);
@@ -60,7 +61,14 @@ namespace QuantumCrossy.Core
             hud.SetProbability(distribution.HighScoreProbability);
             hud.SetDistance(0);
             hud.SetPhotons(0);
-            flow.Begin(config, distribution, player, hud, input);
+
+            var briefingGo = new GameObject("ScoreBriefing");
+            var briefing = briefingGo.AddComponent<ScoreBriefing>();
+            briefing.Show(config, distribution, () =>
+            {
+                input.SetAccepting(true);
+                flow.Begin(config, distribution, player, hud, input);
+            });
         }
 
         void OnDestroy()
