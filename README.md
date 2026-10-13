@@ -90,9 +90,9 @@ Crossy Road처럼 한 칸씩 앞으로 건너는 게임이다. 플레이어는 �
 - `Camera` — 비율에 맞추는 추적 카메라
 - `UI` — 시작 전 점수 안내, 고득점 확률 HUD, 붕괴 화면
 - `Core` — 설정, 부트스트랩, 게임 흐름
-- `Visuals` — URP 기본 머티리얼
+- `Visuals` — URP 머티리얼과 모델 맞춤
 
-비주얼은 큐브·구체 같은 프리미티브다.
+바닥·나무·플레이어·측정 트럭·광자는 `Assets/Models`의 모델을 `Assets/Prefabs`에서 칸에 맞춰 쓴다. 트럭이 측정 게이트 자리에 보이지만, 닿음 판정은 예전과 같은 얇은 상자(`gateThickness` × `gateHeight` × `gateDepth`)다. 플레이어의 측정 구체 반지름도 `playerRadius` 그대로다.
 
 ## 라이선스
 

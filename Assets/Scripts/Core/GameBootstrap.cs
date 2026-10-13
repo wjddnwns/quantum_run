@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
-using UnityEngine.Rendering;
 using QuantumCrossy.CameraRig;
 using QuantumCrossy.Input;
 using QuantumCrossy.Lanes;
@@ -18,6 +17,12 @@ namespace QuantumCrossy.Core
     public sealed class GameBootstrap : MonoBehaviour
     {
         [SerializeField] QuantumCrossyConfig config;
+        [SerializeField] GameObject qubitPrefab = null;
+        [SerializeField] GameObject readoutDevicePrefab = null;
+        [SerializeField] GameObject roadPrefab = null;
+        [SerializeField] GameObject trailPrefab = null;
+        [SerializeField] GameObject treePrefab = null;
+        [SerializeField] GameObject pointPrefab = null;
         InputSystemUIInputModule ownedUi;
 
         void Awake()
@@ -38,7 +43,14 @@ namespace QuantumCrossy.Core
             var worldGo = new GameObject("World");
             worldGo.transform.SetParent(transform, false);
             var world = worldGo.AddComponent<WorldGenerator>();
-            world.Initialize(config, distribution);
+            world.Initialize(
+                config,
+                distribution,
+                roadPrefab,
+                trailPrefab,
+                treePrefab,
+                readoutDevicePrefab,
+                pointPrefab);
 
             var input = gameObject.AddComponent<MoveInput>();
             input.Use(
@@ -104,25 +116,23 @@ namespace QuantumCrossy.Core
             sphere.isTrigger = true;
             sphere.radius = config.playerRadius;
 
-            var visual = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            visual.name = "Visual";
-            visual.transform.SetParent(playerGo.transform, false);
-            visual.transform.localScale = Vector3.one * (config.playerRadius * 2f);
-            DisableCollider(visual);
-            Renderer glow = visual.GetComponent<Renderer>();
-            glow.shadowCastingMode = ShadowCastingMode.Off;
-            glow.sharedMaterial = PrimitiveMaterials.Create(new Color(0.35f, 0.95f, 1f), 2.2f);
-            BlobShadow.Attach(playerGo.transform, 0.62f, 0.62f, null);
+            Transform visualTransform = null;
+            if (qubitPrefab != null)
+            {
+                GameObject visual = Instantiate(qubitPrefab, playerGo.transform);
+                visual.name = "Visual";
+                visual.transform.localPosition = new Vector3(0f, -config.playerBaseY, 0f);
+                visual.transform.localRotation = Quaternion.identity;
+                visual.transform.localScale = Vector3.one;
+                visualTransform = visual.transform;
+            }
+            else
+            {
+                visualTransform = playerGo.transform;
+            }
 
-            var nose = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            nose.name = "Nose";
-            nose.transform.SetParent(visual.transform, false);
-            nose.transform.localPosition = new Vector3(0f, 0.05f, 0.72f);
-            nose.transform.localScale = new Vector3(0.22f, 0.22f, 0.48f);
-            DisableCollider(nose);
-            Renderer noseRenderer = nose.GetComponent<Renderer>();
-            noseRenderer.shadowCastingMode = ShadowCastingMode.Off;
-            noseRenderer.sharedMaterial = PrimitiveMaterials.Create(new Color(0.9f, 1f, 1f), 1.5f);
+            Renderer glow = visualTransform.GetComponentInChildren<Renderer>();
+            BlobShadow.Attach(playerGo.transform, 0.62f, 0.62f, glow);
 
             Vector2Int cell = Vector2Int.zero;
             Vector3 start = world.CellToWorld(cell, config.playerBaseY);
@@ -130,7 +140,7 @@ namespace QuantumCrossy.Core
             body.position = start;
 
             var hopper = playerGo.AddComponent<GridHopper>();
-            hopper.Initialize(config, cell, visual.transform, body);
+            hopper.Initialize(config, cell, visualTransform, body);
             var controller = playerGo.AddComponent<PlayerController>();
             controller.Initialize(config, hopper, world, input, flow, hud);
             return controller;
@@ -166,13 +176,6 @@ namespace QuantumCrossy.Core
             var es = new GameObject("EventSystem");
             es.AddComponent<EventSystem>();
             ownedUi = es.AddComponent<InputSystemUIInputModule>();
-        }
-
-        static void DisableCollider(GameObject go)
-        {
-            Collider col = go.GetComponent<Collider>();
-            if (col != null)
-                col.enabled = false;
         }
     }
 }

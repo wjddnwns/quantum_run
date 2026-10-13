@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 using QuantumCrossy.Core;
 using QuantumCrossy.Gates;
 using QuantumCrossy.Rays;
@@ -21,23 +20,30 @@ namespace QuantumCrossy.Lanes
 
         QuantumCrossyConfig config;
         ScoreDistribution distribution;
-        Material safeDark;
-        Material safeLight;
-        Material border;
-        Material gateTile;
-        Material photonMat;
+        GameObject roadPrefab;
+        GameObject trailPrefab;
+        GameObject treePrefab;
+        GameObject readoutPrefab;
+        GameObject pointPrefab;
         int highestRow = int.MinValue;
         int gateStreak;
 
-        public void Initialize(QuantumCrossyConfig config, ScoreDistribution distribution)
+        public void Initialize(
+            QuantumCrossyConfig config,
+            ScoreDistribution distribution,
+            GameObject roadPrefab,
+            GameObject trailPrefab,
+            GameObject treePrefab,
+            GameObject readoutPrefab,
+            GameObject pointPrefab)
         {
             this.config = config;
             this.distribution = distribution;
-            safeDark = PrimitiveMaterials.Create(new Color(0.09f, 0.24f, 0.30f), 0.05f);
-            safeLight = PrimitiveMaterials.Create(new Color(0.07f, 0.18f, 0.28f), 0.04f);
-            border = PrimitiveMaterials.Create(new Color(0.04f, 0.05f, 0.08f), 0f);
-            gateTile = PrimitiveMaterials.Create(new Color(0.18f, 0.07f, 0.16f), 0.08f);
-            photonMat = PrimitiveMaterials.Create(new Color(1f, 0.92f, 0.55f), 2.6f);
+            this.roadPrefab = roadPrefab;
+            this.trailPrefab = trailPrefab;
+            this.treePrefab = treePrefab;
+            this.readoutPrefab = readoutPrefab;
+            this.pointPrefab = pointPrefab;
             highestRow = config.minRow - 1;
             EnsureAround(0);
         }
@@ -92,14 +98,14 @@ namespace QuantumCrossy.Lanes
             laneList.Add(lane);
 
             int extra = 1;
-            Material playMat = gateLane
-                ? gateTile
-                : ((row & 1) == 0 ? safeDark : safeLight);
+            GameObject playPrefab = gateLane ? roadPrefab : trailPrefab;
 
             for (int x = -config.playHalfWidth - extra; x <= config.playHalfWidth + extra; x++)
             {
                 bool edge = Mathf.Abs(x) > config.playHalfWidth;
-                CreateTile(root.transform, x, row, edge ? border : playMat);
+                CreateTile(root.transform, x, row, edge ? trailPrefab : playPrefab);
+                if (edge)
+                    CreateTree(root.transform, x, row);
             }
 
             if (gateLane)
@@ -127,20 +133,28 @@ namespace QuantumCrossy.Lanes
             return gate;
         }
 
-        void CreateTile(Transform parent, int x, int row, Material material)
+        void CreateTile(Transform parent, int x, int row, GameObject prefab)
         {
-            GameObject tile = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            if (prefab == null)
+                return;
+
+            GameObject tile = Instantiate(prefab, parent);
             tile.name = "Tile";
-            tile.transform.SetParent(parent, false);
-            float size = config.cellSize * 0.94f;
-            tile.transform.localScale = new Vector3(size, 0.2f, size);
-            tile.transform.position = new Vector3(x * config.cellSize, -0.1f, row * config.cellSize);
-            Collider col = tile.GetComponent<Collider>();
-            if (col != null)
-                col.enabled = false;
-            Renderer renderer = tile.GetComponent<Renderer>();
-            renderer.sharedMaterial = material;
-            renderer.shadowCastingMode = ShadowCastingMode.Off;
+            tile.transform.localRotation = Quaternion.identity;
+            tile.transform.localPosition = new Vector3(x * config.cellSize, 0f, row * config.cellSize);
+        }
+
+        void CreateTree(Transform parent, int x, int row)
+        {
+            if (treePrefab == null)
+                return;
+
+            GameObject tree = Instantiate(treePrefab, parent);
+            tree.name = "Tree";
+            tree.transform.localRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+            tree.transform.localPosition = new Vector3(x * config.cellSize, 0f, row * config.cellSize);
+            Renderer renderer = tree.GetComponentInChildren<Renderer>();
+            BlobShadow.Attach(tree.transform, 0.72f, 0.72f, renderer);
         }
 
         void SpawnGates(Lane lane, int row)
@@ -155,25 +169,21 @@ namespace QuantumCrossy.Lanes
             float span = config.gateTravelHalf * 2f;
             float spacing = span / count;
             float offset = Random.Range(0f, spacing);
-            Color color = new Color(1f, 0.28f, 0.58f);
+            Vector3 hitHalf = new Vector3(config.gateThickness, config.gateHeight, config.gateDepth) * 0.5f;
+            Vector3 hitOffset = new Vector3(0f, config.gateHeight * 0.5f, 0f);
 
             for (int i = 0; i < count; i++)
             {
                 float x = -config.gateTravelHalf + offset + i * spacing;
-                GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                go.name = "MeasurementGate";
+                GameObject go = readoutPrefab != null
+                    ? Instantiate(readoutPrefab)
+                    : new GameObject();
+                go.name = "ReadoutDevice";
                 go.transform.SetParent(lane.transform, true);
-                go.transform.localScale = new Vector3(config.gateThickness, config.gateHeight, config.gateDepth);
-                go.transform.position = new Vector3(x, config.gateHeight * 0.5f, row * config.cellSize);
+                go.transform.position = new Vector3(x, 0f, row * config.cellSize);
                 var gate = go.AddComponent<MeasurementGate>();
-                gate.Initialize(row * config.cellSize, speed, config.gateTravelHalf, config.gateVisibleHalf, color);
+                gate.Initialize(row * config.cellSize, speed, config.gateTravelHalf, config.gateVisibleHalf, hitHalf, hitOffset);
                 lane.AddGate(gate);
-                Renderer gateRenderer = go.GetComponent<Renderer>();
-                BlobShadow.Attach(
-                    go.transform,
-                    Mathf.Max(0.36f, config.gateThickness * 2.4f),
-                    config.gateDepth * 0.92f,
-                    gateRenderer);
             }
         }
 
@@ -191,18 +201,16 @@ namespace QuantumCrossy.Lanes
                 x = Mathf.Clamp(x, -config.playHalfWidth, config.playHalfWidth);
             }
 
-            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            GameObject go = pointPrefab != null ? Instantiate(pointPrefab) : new GameObject();
             go.name = "Photon";
             go.transform.SetParent(parent, true);
             go.transform.position = new Vector3(x * config.cellSize, 0.55f, row * config.cellSize);
-            go.transform.localScale = new Vector3(0.14f, 0.28f, 0.14f);
-            go.transform.rotation = Quaternion.Euler(58f, Random.Range(0f, 180f), 12f);
-            Collider col = go.GetComponent<Collider>();
-            col.isTrigger = true;
-            Renderer photonRenderer = go.GetComponent<Renderer>();
-            photonRenderer.sharedMaterial = photonMat;
-            photonRenderer.shadowCastingMode = ShadowCastingMode.Off;
-            BlobShadow.Attach(go.transform, 0.34f, 0.34f, null);
+            go.transform.rotation = Quaternion.Euler(0f, Random.Range(0f, 180f), 0f);
+            var trigger = go.AddComponent<SphereCollider>();
+            trigger.isTrigger = true;
+            trigger.radius = 0.12f;
+            Renderer photonRenderer = go.GetComponentInChildren<Renderer>();
+            BlobShadow.Attach(go.transform, 0.34f, 0.34f, photonRenderer);
             var ray = go.AddComponent<PhotonRay>();
             ray.Initialize(() => distribution.AddPhotons(1));
         }
@@ -227,19 +235,5 @@ namespace QuantumCrossy.Lanes
             }
         }
 
-        void OnDestroy()
-        {
-            DestroyMat(safeDark);
-            DestroyMat(safeLight);
-            DestroyMat(border);
-            DestroyMat(gateTile);
-            DestroyMat(photonMat);
-        }
-
-        static void DestroyMat(Material mat)
-        {
-            if (mat != null)
-                Destroy(mat);
-        }
     }
 }

@@ -144,14 +144,6 @@ namespace QuantumCrossy.Player
         {
             if (hopper != null)
                 hopper.Landed -= OnLanded;
-
-            Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
-            for (int i = 0; i < renderers.Length; i++)
-            {
-                Material mat = renderers[i].sharedMaterial;
-                if (mat != null)
-                    Destroy(mat);
-            }
         }
 
         void OnTriggerEnter(Collider other)

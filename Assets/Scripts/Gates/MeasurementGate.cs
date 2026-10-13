@@ -1,18 +1,17 @@
 using UnityEngine;
-using UnityEngine.Rendering;
-using QuantumCrossy.Visuals;
 
 namespace QuantumCrossy.Gates
 {
     /// <summary>
-    /// 진행 방향(X)으로 얇은 판. 판의 실제 부피와 겹치면 측정이다.
+    /// 진행 방향(X)으로 움직이는 측정체. 보이는 모델과 달리, 판정은 얇은 판 부피만 본다.
     /// 위치는 트랜스폼에 직접 쓴다. 리지드바디 보간을 쓰면 양 끝 순간이동이
     /// 화면 한가운데를 가로지르는 궤적으로 그려진다.
     /// </summary>
     public sealed class MeasurementGate : MonoBehaviour
     {
-        Renderer rend;
-        Material material;
+        Renderer[] renderers = System.Array.Empty<Renderer>();
+        Vector3 hitHalf;
+        Vector3 hitOffset;
         Vector3 frameFrom;
         Vector3 frameTo;
         Vector3 previous;
@@ -25,21 +24,20 @@ namespace QuantumCrossy.Gates
 
         public float LaneZ { get; private set; }
 
-        public void Initialize(float laneZ, float signedSpeed, float travelHalf, float visibleHalf, Color color)
+        public void Initialize(float laneZ, float signedSpeed, float travelHalf, float visibleHalf, Vector3 hitHalf, Vector3 hitOffset)
         {
             LaneZ = laneZ;
             this.signedSpeed = signedSpeed;
             this.travelHalf = travelHalf;
             this.visibleHalf = Mathf.Clamp(visibleHalf, 1f, Mathf.Max(1f, travelHalf - 0.5f));
+            this.hitHalf = hitHalf;
+            this.hitOffset = hitOffset;
 
-            Collider col = GetComponent<Collider>();
-            if (col != null)
-                col.enabled = false;
+            Collider[] cols = GetComponentsInChildren<Collider>(true);
+            for (int i = 0; i < cols.Length; i++)
+                cols[i].enabled = false;
 
-            rend = GetComponent<Renderer>();
-            material = PrimitiveMaterials.Create(color, 1.7f);
-            rend.sharedMaterial = material;
-            rend.shadowCastingMode = ShadowCastingMode.Off;
+            renderers = GetComponentsInChildren<Renderer>(true);
             previous = transform.position;
             frameFrom = previous;
             frameTo = previous;
@@ -65,7 +63,6 @@ namespace QuantumCrossy.Gates
         public bool Hits(Vector3 playerFrom, Vector3 playerTo, float radius)
         {
             CaptureFrame();
-            Vector3 half = HalfExtents;
 
             float gateMove = wrapped ? 0f : Mathf.Abs(frameTo.x - frameFrom.x);
             float playerMove = Vector3.Distance(playerFrom, playerTo);
@@ -75,7 +72,7 @@ namespace QuantumCrossy.Gates
                 float t = steps == 0 ? 1f : i / (float)steps;
                 Vector3 player = Vector3.Lerp(playerFrom, playerTo, t);
                 Vector3 gate = wrapped ? frameTo : Vector3.Lerp(frameFrom, frameTo, t);
-                if (SphereHits(player, radius, gate, half))
+                if (SphereHits(player, radius, gate + hitOffset, hitHalf))
                     return true;
             }
 
@@ -111,19 +108,14 @@ namespace QuantumCrossy.Gates
 
         void ApplyVisibility(float x)
         {
-            if (rend == null)
-                return;
-
             bool show = Mathf.Abs(x) <= visibleHalf;
-            if (rend.enabled != show)
-                rend.enabled = show;
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                Renderer renderer = renderers[i];
+                if (renderer != null && renderer.enabled != show)
+                    renderer.enabled = show;
+            }
         }
-
-        Vector3 HalfExtents =>
-            new Vector3(
-                Mathf.Abs(transform.lossyScale.x),
-                Mathf.Abs(transform.lossyScale.y),
-                Mathf.Abs(transform.lossyScale.z)) * 0.5f;
 
         static bool SphereHits(Vector3 center, float radius, Vector3 boxCenter, Vector3 half)
         {
@@ -132,12 +124,6 @@ namespace QuantumCrossy.Gates
                 Mathf.Clamp(center.y, boxCenter.y - half.y, boxCenter.y + half.y),
                 Mathf.Clamp(center.z, boxCenter.z - half.z, boxCenter.z + half.z));
             return (center - closest).sqrMagnitude <= radius * radius;
-        }
-
-        void OnDestroy()
-        {
-            if (material != null)
-                Destroy(material);
         }
     }
 }
