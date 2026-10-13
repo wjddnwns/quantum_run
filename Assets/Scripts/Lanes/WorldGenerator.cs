@@ -23,7 +23,7 @@ namespace QuantumCrossy.Lanes
         GameObject roadPrefab;
         GameObject trailPrefab;
         GameObject treePrefab;
-        GameObject readoutPrefab;
+        GameObject gatePrefab;
         GameObject pointPrefab;
         int highestRow = int.MinValue;
         int gateStreak;
@@ -34,7 +34,7 @@ namespace QuantumCrossy.Lanes
             GameObject roadPrefab,
             GameObject trailPrefab,
             GameObject treePrefab,
-            GameObject readoutPrefab,
+            GameObject gatePrefab,
             GameObject pointPrefab)
         {
             this.config = config;
@@ -42,7 +42,7 @@ namespace QuantumCrossy.Lanes
             this.roadPrefab = roadPrefab;
             this.trailPrefab = trailPrefab;
             this.treePrefab = treePrefab;
-            this.readoutPrefab = readoutPrefab;
+            this.gatePrefab = gatePrefab;
             this.pointPrefab = pointPrefab;
             highestRow = config.minRow - 1;
             EnsureAround(0);
@@ -169,20 +169,31 @@ namespace QuantumCrossy.Lanes
             float span = config.gateTravelHalf * 2f;
             float spacing = span / count;
             float offset = Random.Range(0f, spacing);
-            Vector3 hitHalf = new Vector3(config.gateThickness, config.gateHeight, config.gateDepth) * 0.5f;
-            Vector3 hitOffset = new Vector3(0f, config.gateHeight * 0.5f, 0f);
 
             for (int i = 0; i < count; i++)
             {
                 float x = -config.gateTravelHalf + offset + i * spacing;
-                GameObject go = readoutPrefab != null
-                    ? Instantiate(readoutPrefab)
+                GameObject go = gatePrefab != null
+                    ? Instantiate(gatePrefab)
                     : new GameObject();
-                go.name = "ReadoutDevice";
+                go.name = "MeasurementGate";
                 go.transform.SetParent(lane.transform, true);
                 go.transform.position = new Vector3(x, 0f, row * config.cellSize);
+
+                Vector3 hitHalf = new Vector3(config.gateThickness, config.gateHeight, config.gateDepth) * 0.5f;
+                Vector3 hitOffset = new Vector3(0f, config.gateHeight * 0.5f, 0f);
+                var visual = go.GetComponent<MeasurementGateVisual>();
+                if (visual != null)
+                {
+                    visual.Fit(config.gateThickness, config.gateHeight, config.gateDepth);
+                    hitHalf = visual.LaserHalf;
+                    hitOffset = visual.LaserOffset;
+                }
+
                 var gate = go.AddComponent<MeasurementGate>();
                 gate.Initialize(row * config.cellSize, speed, config.gateTravelHalf, config.gateVisibleHalf, hitHalf, hitOffset);
+                if (visual != null)
+                    gate.SetPillars(visual.PillarHalf, visual.PillarCenterY, visual.PillarCenterZ);
                 lane.AddGate(gate);
             }
         }

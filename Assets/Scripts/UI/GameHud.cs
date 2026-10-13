@@ -67,7 +67,7 @@ namespace QuantumCrossy.UI
             Place(hintRect, 0.07f, 0.02f, 0.93f, 0.13f);
             Text hint = CreateText(hintRoot.transform, "HintText", 28, FontStyle.Normal, TextAnchor.MiddleCenter, new Color(1f, 1f, 1f, 0.82f));
             Stretch(hint.rectTransform);
-            hint.text = "스와이프 / 마우스 드래그 / WASD\n스페이스는 전진\n얇은 판에 닿으면 측정";
+            hint.text = "스와이프 / 마우스 드래그 / WASD\n스페이스는 전진\n게이트에 닿으면 측정";
 
             collapseRoot = CreateChild(safeRoot, "Collapse");
             var panel = collapseRoot.GetComponent<RectTransform>();

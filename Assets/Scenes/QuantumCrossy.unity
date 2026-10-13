@@ -525,7 +525,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuantumCrossy.Core.GameBootstrap
   config: {fileID: 400002}
   qubitPrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000032, type: 3}
-  readoutDevicePrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000033, type: 3}
+  measurementGatePrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000037, type: 3}
   roadPrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000034, type: 3}
   trailPrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000035, type: 3}
   treePrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000031, type: 3}

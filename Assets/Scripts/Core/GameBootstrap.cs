@@ -18,7 +18,7 @@ namespace QuantumCrossy.Core
     {
         [SerializeField] QuantumCrossyConfig config;
         [SerializeField] GameObject qubitPrefab = null;
-        [SerializeField] GameObject readoutDevicePrefab = null;
+        [SerializeField] GameObject measurementGatePrefab = null;
         [SerializeField] GameObject roadPrefab = null;
         [SerializeField] GameObject trailPrefab = null;
         [SerializeField] GameObject treePrefab = null;
@@ -49,7 +49,7 @@ namespace QuantumCrossy.Core
                 roadPrefab,
                 trailPrefab,
                 treePrefab,
-                readoutDevicePrefab,
+                measurementGatePrefab,
                 pointPrefab);
 
             var input = gameObject.AddComponent<MoveInput>();
