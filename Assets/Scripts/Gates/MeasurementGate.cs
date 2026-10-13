@@ -24,10 +24,12 @@ namespace QuantumCrossy.Gates
         bool wrapped;
 
         public float LaneZ { get; private set; }
+        public int Row { get; private set; }
         public float AbsSpeed => Mathf.Abs(signedSpeed);
 
-        public void Initialize(float laneZ, float signedSpeed, float travelHalf, float visibleHalf, Color color)
+        public void Initialize(int row, float laneZ, float signedSpeed, float travelHalf, float visibleHalf, Color color)
         {
+            Row = row;
             LaneZ = laneZ;
             this.signedSpeed = signedSpeed;
             this.travelHalf = travelHalf;
@@ -48,8 +50,22 @@ namespace QuantumCrossy.Gates
             ApplyVisibility(previous.x);
         }
 
+        /// <summary>
+        /// 이 행을 양자 도약으로 넘긴 뒤 호출한다. 이동, 줄바꿈, 표시, 충돌 판정을 모두 멈춘다.
+        /// </summary>
+        public void Retire()
+        {
+            enabled = false;
+            if (rend != null)
+                rend.enabled = false;
+            Destroy(gameObject);
+        }
+
         void Update()
         {
+            if (!enabled)
+                return;
+
             Vector3 pos = transform.position;
             pos.x += signedSpeed * Time.deltaTime;
             pos.x = WrapX(pos.x);

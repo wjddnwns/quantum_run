@@ -40,7 +40,7 @@ namespace QuantumCrossy.Core
         [Tooltip("판이 몸에 닿기까지 남은 시간이 이보다 길면 아직 이르다. 이 창 안이면 넘는 홉을 탄다")]
         public float quantumWindowMax = 0.1f;
 
-        [Tooltip("판을 넘어 착지했을 때 추가로 얻는 광자 수")]
+        [Tooltip("양자 도약으로 한 행을 처음 넘겼을 때 한 번만 얻는 광자 수")]
         public int quantumJumpBonusPhotons = 2;
 
         [Header("측정 게이트")]

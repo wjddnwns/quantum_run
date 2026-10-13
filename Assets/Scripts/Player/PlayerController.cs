@@ -14,8 +14,9 @@ namespace QuantumCrossy.Player
     public sealed class PlayerController : MonoBehaviour
     {
         readonly List<MeasurementGate> nearby = new List<MeasurementGate>(8);
-        readonly List<MeasurementGate> rewarded = new List<MeasurementGate>(4);
         readonly List<MeasurementGate> phased = new List<MeasurementGate>(4);
+        readonly HashSet<int> bonusRows = new HashSet<int>();
+        readonly List<int> retireRows = new List<int>(4);
 
         QuantumCrossyConfig config;
         GridHopper hopper;
@@ -148,13 +149,7 @@ namespace QuantumCrossy.Player
 
             int row = Mathf.RoundToInt(to.z / config.cellSize);
             world.CopyGatesNear(row, 1, nearby);
-            float forget = config.cellSize * 1.6f;
-            for (int i = rewarded.Count - 1; i >= 0; i--)
-            {
-                MeasurementGate remembered = rewarded[i];
-                if (remembered == null || Mathf.Abs(remembered.transform.position.x - to.x) > forget)
-                    rewarded.RemoveAt(i);
-            }
+            retireRows.Clear();
 
             float bodyReach = config.playerRadius + config.gateThickness * 0.5f + 0.08f;
             for (int i = phased.Count - 1; i >= 0; i--)
@@ -192,14 +187,19 @@ namespace QuantumCrossy.Player
                     return true;
                 }
 
-                if (!cleared || rewarded.Contains(gate))
+                if (!quantumFrame || !cleared || bonusRows.Contains(gate.Row))
                     continue;
 
-                rewarded.Add(gate);
+                bonusRows.Add(gate.Row);
                 pendingClears++;
-                if (quantumFrame && !phased.Contains(gate))
+                if (!phased.Contains(gate))
                     phased.Add(gate);
+                if (!retireRows.Contains(gate.Row))
+                    retireRows.Add(gate.Row);
             }
+
+            for (int i = 0; i < retireRows.Count; i++)
+                world.RetireGates(retireRows[i]);
 
             return false;
         }

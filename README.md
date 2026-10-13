@@ -39,7 +39,7 @@ Crossy Road처럼 한 칸씩 앞으로 건너는 게임이다. 플레이어는 �
 - 점수 = 상태 배수 × 앞으로 간 칸 수 × `scorePerDistance`.
   - 바닥 1, 낮음 3, 중간 8, 높음 20, 전설 50
 - 고득점 확률은 배수 `highScoreMinScale`(기본 20, 높음·전설) 이상인 확률의 합이다. 광자가 없을 때 8%에서 시작한다.
-- 양자 도약의 화면은 높은 홉이 아니다. 타이밍이 맞으면 다음 칸으로 바로 건너뛰고, 출발 칸과 그 사이에 잔상이 잠깐 남는다. 판정은 예전과 같다. 남은 시간이 `quantumWindowMin`~`quantumWindowMax`이면, `hopDuration` 동안 `quantumHopHeight`의 논리 궤적으로 판이 발 아래를 지나갔는지 검사한다. 지나갔으면 착지 보너스를 주고, 그 판이 몸을 빠져나가는 동안에는 그 판만 측정을 유예한다. 다른 판은 그대로 측정이다.
+- 양자 도약의 화면은 높은 홉이 아니다. 타이밍이 맞으면 다음 칸으로 바로 건너뛰고, 출발 칸과 그 사이에 잔상이 잠깐 남는다. 판정은 남은 시간이 `quantumWindowMin`~`quantumWindowMax`이면, `hopDuration` 동안 `quantumHopHeight`의 논리 궤적으로 판이 발 아래를 지나갔는지 검사한다. 지나간 행은 게이트를 바로 없애서 다시 나타나지 않고, 보너스 광자는 그 행에서 한 번만 받는다.
 - 창을 벗어나 낮게 뛰거나, 논리 궤적이 판에 스치면 측정이다. 맞는 순간 하얗게 변하거나 무적이 되지는 않는다.
 - 게이트는 `gateVisibleHalf` 밖에서는 렌더러를 끄고, `gateTravelHalf`에서 반대편으로 옮긴다. 옮기는 동안은 숨겨 두므로 화면 한가운데를 가로지르며 나타나지 않는다.
 - 광자는 물리 트리거가 아니라, 이동 선분과 광자 중심의 수평 거리(`photonPickupRadius`)로 줍는다. 플레이어·게이트·광자 아래에는 바닥에 붙는 그림자가 있다.
@@ -63,7 +63,7 @@ Crossy Road처럼 한 칸씩 앞으로 건너는 게임이다. 플레이어는 �
 | `hopHeight` / `quantumHopHeight` | 0.42 / 1.15 | 일반 홉 높이 / 양자 도약의 판정 높이(화면은 순간이동) |
 | `quantumGhostDuration` | 0.32 | 양자 도약 잔상이 남는 시간(초) |
 | `quantumWindowMin` / `quantumWindowMax` | 0.04 / 0.1 | 넘는 홉이 나오는 타이밍 창(초). 판이 몸에 닿기까지 남은 시간 |
-| `quantumJumpBonusPhotons` | 2 | 판을 넘어 착지했을 때 판 하나당 광자 |
+| `quantumJumpBonusPhotons` | 2 | 양자 도약으로 한 행을 처음 넘겼을 때 한 번만 주는 광자 |
 | `gateSpeed` / `gateSpeedPerRow` / `maxGateSpeed` | 5.5 / 0.035 / 12 | 게이트 속도와 거리 가속 |
 | `gateThickness` / `gateHeight` / `gateDepth` | 0.14 / 0.78 / 0.86 | 판의 X 두께, 높이, Z 너비. 충돌은 이 박스뿐이다 |
 | `gateTravelHalf` / `gateVisibleHalf` | 12 / 7.5 | 반대편으로 옮기는 지점 / 이보다 바깥이면 숨김 |
