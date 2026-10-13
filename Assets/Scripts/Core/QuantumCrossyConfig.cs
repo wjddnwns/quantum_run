@@ -24,24 +24,8 @@ namespace QuantumCrossy.Core
         [Tooltip("한 칸 이동에 걸리는 시간(초)")]
         public float hopDuration = 0.26f;
 
-        [Tooltip("일반 홉 높이. 판 높이보다 낮아서, 이 높이로는 판을 넘지 못한다")]
+        [Tooltip("홉 높이. 판보다 낮아서 이 높이로는 판을 넘지 못한다")]
         public float hopHeight = 0.42f;
-
-        [Tooltip("양자 도약의 판정 높이. 화면은 순간이동이고, 이 높이의 논리 궤적으로 판을 넘었는지 본다")]
-        public float quantumHopHeight = 1.15f;
-
-        [Tooltip("양자 도약 잔상이 남는 시간(초)")]
-        public float quantumGhostDuration = 0.32f;
-
-        [Header("양자 도약")]
-        [Tooltip("판이 몸에 닿기까지 남은 시간이 이보다 짧으면 너무 늦다")]
-        public float quantumWindowMin = 0.04f;
-
-        [Tooltip("판이 몸에 닿기까지 남은 시간이 이보다 길면 아직 이르다. 이 창 안이면 넘는 홉을 탄다")]
-        public float quantumWindowMax = 0.1f;
-
-        [Tooltip("양자 도약으로 한 행을 처음 넘겼을 때 한 번만 얻는 광자 수")]
-        public int quantumJumpBonusPhotons = 2;
 
         [Header("측정 게이트")]
         public float gateSpeed = 5.5f;
@@ -50,7 +34,7 @@ namespace QuantumCrossy.Core
         [Tooltip("판이 움직이는 방향(X)의 두께")]
         public float gateThickness = 0.14f;
 
-        [Tooltip("판의 높이. 일반 홉보다 높고, 넘는 홉보다는 낮게")]
+        [Tooltip("판의 높이. 홉보다 높아서 뛰어서 넘지 못한다")]
         public float gateHeight = 0.78f;
 
         [Tooltip("레인을 막는 방향(Z)의 너비")]
@@ -133,11 +117,6 @@ namespace QuantumCrossy.Core
             if (playerBaseY < 0.05f) playerBaseY = 0.3f;
             if (hopDuration < 0.05f) hopDuration = 0.26f;
             if (hopHeight < 0.05f) hopHeight = 0.42f;
-            if (quantumHopHeight < hopHeight) quantumHopHeight = 1.15f;
-            if (quantumGhostDuration < 0.05f) quantumGhostDuration = 0.32f;
-            if (quantumWindowMin < 0f) quantumWindowMin = 0f;
-            if (quantumWindowMax <= quantumWindowMin) quantumWindowMax = quantumWindowMin + 0.08f;
-            if (quantumJumpBonusPhotons < 0) quantumJumpBonusPhotons = 0;
             if (gateSpeed < 0.1f) gateSpeed = 5.5f;
             if (maxGateSpeed < gateSpeed) maxGateSpeed = gateSpeed;
             if (gateThickness < 0.02f) gateThickness = 0.14f;

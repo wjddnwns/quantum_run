@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,14 +8,13 @@ namespace QuantumCrossy.UI
     {
         const string WarmupText =
             "길건너 양자들 고득점 확률 진행 광자 스와이프 마우스 드래그 또는 WASD 방향키 스페이스는 전진 " +
-            "게이트가 다가올 때 타이밍을 맞춰 뛰어들면 양자 도약 파동함수 붕괴 측정 게이트에 닿았습니다 " +
+            "얇은 판에 닿으면 측정 파동함수 붕괴 측정 게이트에 닿았습니다 " +
             "관측된 상태 점수 직전 모은 다시 하기 바닥 낮음 중간 높음 전설 +%./";
 
         Font font;
         Text probabilityText;
         Text distanceText;
         Text photonText;
-        Text toastText;
         Image probabilityFill;
         GameObject hintRoot;
         GameObject collapseRoot;
@@ -25,7 +23,6 @@ namespace QuantumCrossy.UI
         Text collapseDetail;
         RectTransform safeRoot;
         Rect lastSafe;
-        Coroutine toastRoutine;
 
         public void Build(Action onRestart)
         {
@@ -70,11 +67,7 @@ namespace QuantumCrossy.UI
             Place(hintRect, 0.07f, 0.02f, 0.93f, 0.13f);
             Text hint = CreateText(hintRoot.transform, "HintText", 28, FontStyle.Normal, TextAnchor.MiddleCenter, new Color(1f, 1f, 1f, 0.82f));
             Stretch(hint.rectTransform);
-            hint.text = "스와이프 / 마우스 드래그 / WASD\n스페이스는 전진\n얇은 판이 지나갈 때 뛰어넘으면 양자 도약";
-
-            toastText = CreateText(safeRoot, "Toast", 42, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.95f, 0.7f));
-            Place(toastText.rectTransform, 0.1f, 0.62f, 0.9f, 0.70f);
-            toastText.gameObject.SetActive(false);
+            hint.text = "스와이프 / 마우스 드래그 / WASD\n스페이스는 전진\n얇은 판에 닿으면 측정";
 
             collapseRoot = CreateChild(safeRoot, "Collapse");
             var panel = collapseRoot.GetComponent<RectTransform>();
@@ -144,23 +137,10 @@ namespace QuantumCrossy.UI
                 photonText.text = "광자 " + Mathf.Max(0, count);
         }
 
-        public void ShowQuantumJump(int bonusPhotons)
-        {
-            if (toastText == null)
-                return;
-            toastText.text = "양자 도약 +" + bonusPhotons;
-            toastText.gameObject.SetActive(true);
-            if (toastRoutine != null)
-                StopCoroutine(toastRoutine);
-            toastRoutine = StartCoroutine(HideToast());
-        }
-
         public void ShowCollapse(int score, string stateName, float probability, int photons, int distance)
         {
             if (hintRoot != null)
                 hintRoot.SetActive(false);
-            if (toastText != null)
-                toastText.gameObject.SetActive(false);
             if (collapseState != null)
                 collapseState.text = "관측된 상태  " + stateName;
             if (collapseScore != null)
@@ -199,14 +179,6 @@ namespace QuantumCrossy.UI
             safeRoot.anchorMax = max;
             safeRoot.offsetMin = Vector2.zero;
             safeRoot.offsetMax = Vector2.zero;
-        }
-
-        IEnumerator HideToast()
-        {
-            yield return new WaitForSeconds(0.85f);
-            if (toastText != null)
-                toastText.gameObject.SetActive(false);
-            toastRoutine = null;
         }
 
         Text CreateText(Transform parent, string name, int size, FontStyle style, TextAnchor anchor, Color color)

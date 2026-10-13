@@ -65,13 +65,6 @@ namespace QuantumCrossy.Lanes
             RemoveBehind(playerRow - config.behindRows);
         }
 
-        public void RetireGates(int row)
-        {
-            if (!lanes.TryGetValue(row, out Lane lane) || lane == null)
-                return;
-            lane.RetireGates();
-        }
-
         public void CopyGatesNear(int row, int span, List<MeasurementGate> into)
         {
             into.Clear();
@@ -173,7 +166,7 @@ namespace QuantumCrossy.Lanes
                 go.transform.localScale = new Vector3(config.gateThickness, config.gateHeight, config.gateDepth);
                 go.transform.position = new Vector3(x, config.gateHeight * 0.5f, row * config.cellSize);
                 var gate = go.AddComponent<MeasurementGate>();
-                gate.Initialize(row, row * config.cellSize, speed, config.gateTravelHalf, config.gateVisibleHalf, color);
+                gate.Initialize(row * config.cellSize, speed, config.gateTravelHalf, config.gateVisibleHalf, color);
                 lane.AddGate(gate);
                 Renderer gateRenderer = go.GetComponent<Renderer>();
                 BlobShadow.Attach(

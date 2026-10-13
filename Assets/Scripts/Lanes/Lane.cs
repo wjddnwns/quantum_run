@@ -24,16 +24,5 @@ namespace QuantumCrossy.Lanes
             if (gate != null)
                 gates.Add(gate);
         }
-
-        public void RetireGates()
-        {
-            for (int i = 0; i < gates.Count; i++)
-            {
-                if (gates[i] != null)
-                    gates[i].Retire();
-            }
-
-            gates.Clear();
-        }
     }
 }

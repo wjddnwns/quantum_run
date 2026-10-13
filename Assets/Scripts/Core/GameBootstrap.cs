@@ -50,7 +50,7 @@ namespace QuantumCrossy.Core
             hud.Build(flow.Restart);
             input.SetAccepting(false);
 
-            PlayerController player = CreatePlayer(world, input, distribution, flow, hud);
+            PlayerController player = CreatePlayer(world, input, flow, hud);
             BindCamera(player.transform);
 
             distribution.Changed += () =>
@@ -88,7 +88,6 @@ namespace QuantumCrossy.Core
         PlayerController CreatePlayer(
             WorldGenerator world,
             MoveInput input,
-            ScoreDistribution distribution,
             GameFlow flow,
             GameHud hud)
         {
@@ -133,7 +132,7 @@ namespace QuantumCrossy.Core
             var hopper = playerGo.AddComponent<GridHopper>();
             hopper.Initialize(config, cell, visual.transform, body);
             var controller = playerGo.AddComponent<PlayerController>();
-            controller.Initialize(config, hopper, world, input, distribution, flow, hud);
+            controller.Initialize(config, hopper, world, input, flow, hud);
             return controller;
         }
 

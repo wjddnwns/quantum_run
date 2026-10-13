@@ -474,11 +474,6 @@ MonoBehaviour:
   playerBaseY: 0.3
   hopDuration: 0.26
   hopHeight: 0.42
-  quantumHopHeight: 1.15
-  quantumGhostDuration: 0.32
-  quantumWindowMin: 0.04
-  quantumWindowMax: 0.1
-  quantumJumpBonusPhotons: 2
   gateSpeed: 5.5
   gateSpeedPerRow: 0.035
   maxGateSpeed: 12

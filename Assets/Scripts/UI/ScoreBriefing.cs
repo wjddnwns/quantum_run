@@ -122,9 +122,7 @@ namespace QuantumCrossy.UI
                 "게이트에 닿으면 측정된다.\n" +
                 "그 확률로 상태를 하나 뽑고, 게임은 끝난다.\n" +
                 "점수 = 상태 배수 × 전진한 칸 × " + config.scorePerDistance.ToString("0.##") + "\n" +
-                states + "\n\n" +
-                "퀀텀 점프로 게이트 줄을 넘으면\n" +
-                "보너스 광선 " + config.quantumJumpBonusPhotons + "개. 한 줄에 한 번.";
+                states;
         }
 
         void ApplySafeArea()
