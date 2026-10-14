@@ -102,6 +102,8 @@ namespace QuantumCrossy.Player
                 return;
 
             world.EnsureAround(target.y);
+            if (world.IsBlocked(target))
+                return;
             Vector3 to = world.CellToWorld(target, config.playerBaseY);
             hopper.Hop(target, to);
         }

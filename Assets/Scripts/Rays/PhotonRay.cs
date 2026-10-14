@@ -8,14 +8,20 @@ namespace QuantumCrossy.Rays
     {
         static readonly List<PhotonRay> active = new List<PhotonRay>(32);
 
+        static readonly int EmissionId = Shader.PropertyToID("_EmissionColor");
+
         Action onCollected;
         Vector3 origin;
         bool collected;
+        Renderer glowRenderer;
+        MaterialPropertyBlock glowBlock;
 
         public void Initialize(Action collectedCallback)
         {
             onCollected = collectedCallback;
             origin = transform.position;
+            glowRenderer = GetComponentInChildren<Renderer>();
+            glowBlock = new MaterialPropertyBlock();
         }
 
         void OnEnable()
@@ -33,9 +39,16 @@ namespace QuantumCrossy.Rays
         {
             float wave = Mathf.Sin(Time.time * 3.2f + origin.x * 1.7f);
             Vector3 pos = origin;
-            pos.y += wave * 0.08f;
+            pos.y += wave * 0.16f;
             transform.position = pos;
-            transform.Rotate(0f, 40f * Time.deltaTime, 0f, Space.World);
+            transform.Rotate(0f, 96f * Time.deltaTime, 0f, Space.World);
+            if (glowRenderer != null)
+            {
+                float pulse = 1.4f + 0.7f * wave;
+                glowRenderer.GetPropertyBlock(glowBlock);
+                glowBlock.SetColor(EmissionId, new Color(0.35f, 1.15f, 0.85f) * pulse);
+                glowRenderer.SetPropertyBlock(glowBlock);
+            }
         }
 
         /// <summary>
