@@ -257,14 +257,13 @@ namespace QuantumCrossy.Lanes
             GameObject go = pointPrefab != null ? Instantiate(pointPrefab) : new GameObject();
             go.name = "Photon";
             go.transform.SetParent(lane.transform, true);
-            go.transform.localScale = new Vector3(1.9f, 1.9f, 1.9f);
-            go.transform.position = new Vector3(x * config.cellSize, 0.95f, row * config.cellSize);
+            go.transform.position = new Vector3(x * config.cellSize, 0.55f, row * config.cellSize);
             go.transform.rotation = Quaternion.Euler(0f, Random.Range(0f, 180f), 0f);
             var trigger = go.AddComponent<SphereCollider>();
             trigger.isTrigger = true;
             trigger.radius = 0.12f;
             Renderer photonRenderer = go.GetComponentInChildren<Renderer>();
-            BlobShadow.Attach(go.transform, 0.5f, 0.5f, photonRenderer);
+            BlobShadow.Attach(go.transform, 0.34f, 0.34f, photonRenderer);
             var ray = go.AddComponent<PhotonRay>();
             ray.Initialize(() => distribution.AddPhotons(1));
         }
