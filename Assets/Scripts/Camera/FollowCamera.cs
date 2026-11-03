@@ -64,8 +64,10 @@ namespace QuantumCrossy.CameraRig
 
         void LookAtAnchor()
         {
-            Vector3 look = Anchor() + new Vector3(-config.cameraLookLeft, 0.15f, config.cameraLookAhead);
+            Vector3 look = Anchor() + new Vector3(0f, 0.15f, 0f);
+
             Vector3 forward = look - transform.position;
+
             if (forward.sqrMagnitude > 0.001f)
                 transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
         }
@@ -75,17 +77,38 @@ namespace QuantumCrossy.CameraRig
             Vector3 anchor = target.position;
             anchor.y = config.playerBaseY;
             return anchor;
-        }
+            }
 
         Vector3 DesiredPosition()
         {
             float t = AspectT();
-            float back = Mathf.Lerp(config.portraitBack, config.landscapeBack, t);
-            float height = Mathf.Lerp(config.portraitHeight, config.landscapeHeight, t);
-            float side = Mathf.Lerp(config.portraitSide, config.landscapeSide, t);
-            return Anchor() + new Vector3(side, height, -back);
-        }
 
+            float back = Mathf.Lerp(
+                config.portraitBack,
+                config.landscapeBack,
+                t
+            );
+
+            float side = Mathf.Lerp(
+                config.portraitSide,
+                config.landscapeSide,
+                t
+            );
+
+            // 지면 기준 하향 각도
+            const float pitch = 50f;
+
+            // 수평 거리
+            float horizontalDistance = Mathf.Sqrt(
+                side * side + back * back
+            );
+
+            // 하향 각도에 맞춰 높이 계산
+            float height = 0.15f +
+                horizontalDistance * Mathf.Tan(pitch * Mathf.Deg2Rad);
+
+        return Anchor() + new Vector3(side, height, -back);
+        }   
         float CurrentFov()
         {
             return Mathf.Lerp(config.portraitFov, config.landscapeFov, AspectT());
