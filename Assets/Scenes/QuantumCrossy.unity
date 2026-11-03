@@ -38,12 +38,12 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -119,6 +119,113 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &400000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 400001}
+  - component: {fileID: 400002}
+  - component: {fileID: 400003}
+  m_Layer: 0
+  m_Name: QuantumCrossy
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &400001
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 400000}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &400002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 400000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b1a9c2e4d6f4081a3b5c7d9e1f30401, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QuantumCrossy.Core.QuantumCrossyConfig
+  cellSize: 1
+  playHalfWidth: 5
+  playerRadius: 0.26
+  playerBaseY: 0.3
+  hopDuration: 0.26
+  hopHeight: 0.42
+  gateSpeed: 5.5
+  gateSpeedPerRow: 0.035
+  maxGateSpeed: 12
+  gateThickness: 0.14
+  gateHeight: 0.78
+  gateDepth: 0.86
+  gateTravelHalf: 12
+  gateVisibleHalf: 7.5
+  minGatesPerLane: 1
+  maxGatesPerLane: 2
+  minRow: -2
+  safeStartRows: 5
+  aheadRows: 16
+  behindRows: 7
+  gateLaneWeight: 0.58
+  maxConsecutiveGateLanes: 2
+  photonRowChance: 0.14
+  photonLateralChance: 0.05
+  photonLateralReach: 1
+  photonPickupRadius: 0.45
+  betaPerPhoton: 0.16
+  highScoreMinScale: 20
+  scorePerDistance: 1
+  portraitBack: 7.6
+  portraitHeight: 5.5
+  portraitSide: 2.5
+  portraitFov: 48
+  landscapeBack: 9.6
+  landscapeHeight: 6.8
+  landscapeSide: 3.3
+  landscapeFov: 42
+  cameraLookAhead: 4.4
+  cameraLookLeft: 1.05
+  cameraSmoothTime: 0.14
+  portraitAspect: 0.5625
+  landscapeAspect: 1.7778
+  swipeThresholdPixels: 36
+--- !u!114 &400003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 400000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b1a9c2e4d6f4081a3b5c7d9e1f30403, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QuantumCrossy.Core.GameBootstrap
+  config: {fileID: 400002}
+  qubitPrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000032, type: 3}
+  measurementGatePrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000037, type: 3}
+  roadPrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000034, type: 3}
+  trailPrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000035, type: 3}
+  treePrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000031, type: 3}
+  pointPrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000036, type: 3}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -248,14 +355,14 @@ MonoBehaviour:
   m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
-  m_Version: 2
   m_TaaSettings:
-    quality: 3
-    frameInfluence: 0.1
-    jitterScale: 1
-    mipBias: 0
-    varianceClampScale: 0.9
-    contrastAdaptiveSharpening: 0
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -282,14 +389,14 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 410087039}
   m_Enabled: 1
-  serializedVersion: 11
+  serializedVersion: 12
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 2
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
-  m_CookieSize: 10
+  m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
     m_Type: 2
     m_Resolution: -1
@@ -336,6 +443,9 @@ Light:
   m_ForceVisible: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
 --- !u!4 &410087041
 Transform:
   m_ObjectHideFlags: 0
@@ -363,17 +473,80 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Version: 3
   m_UsePipelineSettings: 1
   m_AdditionalLightsShadowResolutionTier: 2
-  m_LightLayerMask: 1
-  m_RenderingLayers: 1
   m_CustomShadowLayers: 0
-  m_ShadowLayerMask: 1
-  m_ShadowRenderingLayers: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 1
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
+--- !u!1001 &802135639
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 100000, guid: a11b0001c0ffee000000000000000031, type: 3}
+      propertyPath: m_Name
+      value: Tree
+      objectReference: {fileID: 0}
+    - target: {fileID: 100001, guid: a11b0001c0ffee000000000000000031, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.83364
+      objectReference: {fileID: 0}
+    - target: {fileID: 100001, guid: a11b0001c0ffee000000000000000031, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 100001, guid: a11b0001c0ffee000000000000000031, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.47185
+      objectReference: {fileID: 0}
+    - target: {fileID: 100001, guid: a11b0001c0ffee000000000000000031, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 100001, guid: a11b0001c0ffee000000000000000031, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 100001, guid: a11b0001c0ffee000000000000000031, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 100001, guid: a11b0001c0ffee000000000000000031, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 100001, guid: a11b0001c0ffee000000000000000031, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 100001, guid: a11b0001c0ffee000000000000000031, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 100001, guid: a11b0001c0ffee000000000000000031, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a11b0001c0ffee000000000000000031, type: 3}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -423,113 +596,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &400000
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 400001}
-  - component: {fileID: 400002}
-  - component: {fileID: 400003}
-  m_Layer: 0
-  m_Name: QuantumCrossy
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &400001
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 400000}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &400002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 400000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b1a9c2e4d6f4081a3b5c7d9e1f30401, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::QuantumCrossy.Core.QuantumCrossyConfig
-  cellSize: 1
-  playHalfWidth: 5
-  playerRadius: 0.26
-  playerBaseY: 0.3
-  hopDuration: 0.26
-  hopHeight: 0.42
-  gateSpeed: 5.5
-  gateSpeedPerRow: 0.035
-  maxGateSpeed: 12
-  gateThickness: 0.14
-  gateHeight: 0.78
-  gateDepth: 0.86
-  gateTravelHalf: 12
-  gateVisibleHalf: 7.5
-  minGatesPerLane: 1
-  maxGatesPerLane: 2
-  minRow: -2
-  safeStartRows: 5
-  aheadRows: 16
-  behindRows: 7
-  gateLaneWeight: 0.58
-  maxConsecutiveGateLanes: 2
-  photonRowChance: 0.14
-  photonLateralChance: 0.05
-  photonLateralReach: 1
-  photonPickupRadius: 0.45
-  betaPerPhoton: 0.16
-  highScoreMinScale: 20
-  scorePerDistance: 1
-  portraitBack: 7.6
-  portraitHeight: 5.5
-  portraitSide: 2.5
-  portraitFov: 48
-  landscapeBack: 9.6
-  landscapeHeight: 6.8
-  landscapeSide: 3.3
-  landscapeFov: 42
-  cameraLookAhead: 4.4
-  cameraLookLeft: 1.05
-  cameraSmoothTime: 0.14
-  portraitAspect: 0.5625
-  landscapeAspect: 1.7778
-  swipeThresholdPixels: 36
---- !u!114 &400003
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 400000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b1a9c2e4d6f4081a3b5c7d9e1f30403, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::QuantumCrossy.Core.GameBootstrap
-  config: {fileID: 400002}
-  qubitPrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000032, type: 3}
-  measurementGatePrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000037, type: 3}
-  roadPrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000034, type: 3}
-  trailPrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000035, type: 3}
-  treePrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000031, type: 3}
-  pointPrefab: {fileID: 100000, guid: a11b0001c0ffee000000000000000036, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -538,3 +604,4 @@ SceneRoots:
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 400001}
+  - {fileID: 802135639}
