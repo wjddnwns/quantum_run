@@ -123,7 +123,6 @@ namespace QuantumCrossy.Core
                 visual.name = "Visual";
                 visual.transform.localPosition = new Vector3(0f, -config.playerBaseY, 0f);
                 visual.transform.localRotation = Quaternion.identity;
-                visual.transform.localScale = Vector3.one;
                 visualTransform = visual.transform;
             }
             else

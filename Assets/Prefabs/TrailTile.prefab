@@ -55,7 +55,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 100000}
-  m_Mesh: {fileID: 0}
+  m_Mesh: {fileID: 8728854048086142887, guid: a11b0001c0ffee000000000000000004, type: 3}
 --- !u!23 &100004
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -103,4 +103,5 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
